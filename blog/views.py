@@ -27,12 +27,14 @@ def post_list(request):
 
 
 def post_detail(request,year,month,day,post):
+    #Get the post
     post=get_object_or_404(Post,
                             status=Post.Status.PUBLISHED,
                             slug=post,
                             publish__year=year,
                             publish__month=month,
                             publish__day=day)
+    #render the template with the data
     return render(request,
                   'blog/post/detail.html',
                   {'post': post})
@@ -43,18 +45,25 @@ def post_share(request,post_id):
     post=get_object_or_404(Post.published,id=post_id)
     sent=False
     if request.method == 'POST':
+        #Create form from request data
         form=EmailPostForm(request.POST)
+        #Check if form is valid
         if form.is_valid():
+            #Clean the form data
             cd = form.cleaned_data
+            #Build absolute url for the post
             post_url = request.build_absolute_uri(post.get_absolute_url())
+            #email subject
             subject = f"{cd['name']} recommends you read {post.title}" 
+            #email message
             message = f"Read {post.title} at {post_url}\n\n" \
             f"{cd['name']}\'s comments: {cd['comments']}"
+            #Send te email
             send_mail(subject, message, 'your_account@gmail.com',[cd['to']])
         sent = True
     else:
         form=EmailPostForm()
-    return render(request,'blog/post/share.html',{'form':form})
+    return render(request,'blog/post/share.html',{'post': post,'form':form,'sent':sent})
 
 class PostListView(ListView):
     #Alternative post list view
