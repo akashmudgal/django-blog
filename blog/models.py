@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.urls import reverse
+from taggit.managers import TaggableManager
+
 
 #QuerySet manager for getting published posts
 class PublishedManager(models.Manager):
@@ -15,6 +17,7 @@ class Post(models.Model):
         DRAFT = 'DF', 'Draft'
         PUBLISHED= 'PB', 'Published'
 
+    tags=TaggableManager()
     #Post title
     title = models.CharField(max_length=250)
     #Post slug for urls,
